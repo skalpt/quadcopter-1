@@ -1701,7 +1701,7 @@ sonarAlt = srf08_ctx.range[0]; //tmp
 #elif defined(TINY_GPS_SONAR)
 inline void Sonar_init() {}
 void Sonar_update() {
-  /* do not query the module again if the GPS loop already did */
+  // do not query the module again if the GPS loop already did
   #if defined(TINY_GPS)
     if (!GPS_Enable) {
   #else
@@ -1710,11 +1710,86 @@ void Sonar_update() {
       tinygps_query();
     }
 }
+/* Removing this to support HCSR04
 #else
 inline void Sonar_init() {}
 inline void Sonar_update() {}
 #endif
+*/
 
+// ************************************************************************************************************
+// HC-SR04 Ultrasonic Sonar
+// ************************************************************************************************************
+
+#elif defined(HCSR04)
+
+volatile unsigned long HCSR04_starTime = 0;
+volatile unsigned long HCSR04_echoTime = 0;
+volatile unsigned int HCSR04_waiting_echo = 0;
+unsigned int HCSR04_current_loops = 0;
+
+// The cycle time is between 3000 and 6000 microseconds
+// The recommend cycle period for sonar request should be no less than 50ms -> 50000 microseconds
+// A reading every 18 loops (50000 / 3000 aprox)
+unsigned int HCSR04_loops = 18;
+
+void Sonar_init()
+{
+  // Pin change interrupt control register - enables interrupt vectors
+  PCICR  |= (1<<PCIE0); // D8
+  
+  // Pin change mask registers decide which pins are enabled as triggers
+  PCMSK0 = (1<<PCINT0); // pin 8
+  
+  pinMode(HCSR04_TriggerPin, OUTPUT);
+   
+}
+
+ISR(PCINT0_vect) {
+    uint8_t pin = PINB;
+    if (pin & 1<<PCINT0) {     //indicates if the bit 0 of the arduino port [B0-B7] is at a high state
+      HCSR04_starTime = micros();
+    }
+    else {
+      HCSR04_echoTime = micros() - HCSR04_starTime; // Echo time in microseconds
+     
+      if (HCSR04_echoTime <= 25000) {     // valid distance
+        sonarAlt = HCSR04_echoTime / 58;
+      }
+      else
+      {
+      // No valid data
+        sonarAlt = -1; // Originally set to 9999 but looks crappy in Processing
+      }
+      HCSR04_waiting_echo = 0;
+    }
+}
+
+void Sonar_update()
+{
+  HCSR04_current_loops++;
+  
+  if (HCSR04_waiting_echo == 0 && HCSR04_current_loops >= HCSR04_loops)
+  {
+    // Send 2ms LOW pulse to ensure we get a nice clean pulse
+    digitalWrite(HCSR04_TriggerPin, LOW);      
+    delayMicroseconds(2);
+   
+    // send 10 microsecond pulse
+    digitalWrite(HCSR04_TriggerPin, HIGH); 
+    // wait 10 microseconds before turning off
+    delayMicroseconds(10);
+    // stop sending the pulse
+    digitalWrite(HCSR04_TriggerPin, LOW);
+   
+    HCSR04_waiting_echo = 1;
+    HCSR04_current_loops = 0;
+  }
+}
+#else
+inline void Sonar_init() {}
+inline void Sonar_update() {}
+#endif
 
 
 void initSensors() {

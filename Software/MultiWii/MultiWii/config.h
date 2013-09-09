@@ -184,6 +184,7 @@
       //#define MAG3110
 
       /* Sonar */ // for visualization purpose currently - no control code behind
+      #define HCSR04 // HC-SR04 Ultrasonic Sonar
       //#define SRF02 // use the Devantech SRF i2c sensors
       //#define SRF08
       //#define SRF10

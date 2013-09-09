@@ -73,6 +73,10 @@ extern int16_t angle[2];
   extern int32_t baroPressureSum;
 #endif
 
+#if SONAR
+  extern int16_t sonarAlt;
+#endif
+
 extern int16_t axisPID[3];
 extern int16_t motor[8];
 extern int16_t servo[8];

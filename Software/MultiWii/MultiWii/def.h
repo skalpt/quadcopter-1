@@ -1600,12 +1600,22 @@
   #define GPS 0
 #endif
 
-#if defined(SRF02) || defined(SRF08) || defined(SRF10) || defined(SRC235) || defined(TINY_GPS_SONAR) || defined(I2C_GPS_SONAR)
+#if defined(SRF02) || defined(SRF08) || defined(SRF10) || defined(SRC235) || defined(TINY_GPS_SONAR) || defined(I2C_GPS_SONAR) || defined(HCSR04)
   #define SONAR 1
 #else
   #define SONAR 0
 #endif
 
+#if defined(HCSR04)
+  #define BUZZERPIN_PINMODE          ;
+  #define BUZZERPIN_ON               ;
+  #define BUZZERPIN_OFF              ;
+  #define POWERPIN_PINMODE           ;
+  #define POWERPIN_ON                ;
+  #define POWERPIN_OFF               ;
+  #define HCSR04_EchoPin         8
+  #define HCSR04_TriggerPin      12
+#endif
 
 #if defined(MMA7455)
   #define ACC_1G 64
