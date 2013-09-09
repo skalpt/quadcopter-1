@@ -7,6 +7,15 @@ import javax.swing.JFileChooser; // Saving dialogue
 import javax.swing.filechooser.FileFilter; // for our configuration file filter "*.mwi"
 import javax.swing.JOptionPane; // for message dialogue
 
+// New references required for Processing 2.x
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Properties;
+import java.util.Date;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+
 // TODO add new msp :  pid description with bound and scale
 
 PrintWriter output;
@@ -1898,3 +1907,4 @@ public void Tooltips(){
   controlP5.getTooltip().register("bQCONN","ComPort must be Selected First Time.") ;  
   controlP5.getTooltip().register("SETTING","Save Multiple settings.") ;
   }
+
